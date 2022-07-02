@@ -6,8 +6,8 @@
 
 // @namespace    https://github.com/DayvidKnows/Youtube-chapter-keyboard-navigation/
 // @homepageURL  https://github.com/DayvidKnows/Youtube-chapter-keyboard-navigation/
-// @downloadURL  https://raw.githubusercontent.com/DayvidKnows/Youtube-chapter-keyboard-navigation/Youtube-chapter-keyboard-navigation.user.js
-// @updateURL    https://raw.githubusercontent.com/DayvidKnows/Youtube-chapter-keyboard-navigation/Youtube-chapter-keyboard-navigation.user.js
+// @downloadURL  https://github.com/DayvidKnows/Youtube-chapter-keyboard-navigation/raw/master/Youtube-chapter-keyboard-navigation.user.js
+// @updateURL    https://github.com/DayvidKnows/Youtube-chapter-keyboard-navigation/raw/master/Youtube-chapter-keyboard-navigation.user.js
 
 // @match        http*://www.youtube.com/watch?v=*
 // @require      https://code.jquery.com/jquery-3.4.1.min.js
