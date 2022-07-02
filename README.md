@@ -18,7 +18,7 @@ It allows its user to navigate between Youtube's video chapters with the keyboar
 
 #### Step 2: UserScript
 
-* [Install](https://raw.githubusercontent.com/DayvidKnows/Youtube-chapter-keyboard-navigation/Youtube-chapter-keyboard-navigation.user.js) *from github.com*
+* [Install](https://github.com/DayvidKnows/Youtube-chapter-keyboard-navigation/raw/master/Youtube-chapter-keyboard-navigation.user.js) *from github.com*
 
 ---
 
