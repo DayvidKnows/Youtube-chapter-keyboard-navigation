@@ -22,4 +22,4 @@ It allows its user to navigate between Youtube's video chapters with the keyboar
 
 ---
 
-##### Some parts of this Readme are copied from [anti-adblock-killer](https://github.com/reek/anti-adblock-killer).
+##### Some parts of this Readme were copied from [anti-adblock-killer](https://github.com/reek/anti-adblock-killer).
