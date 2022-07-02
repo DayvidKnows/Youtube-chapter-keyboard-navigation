@@ -9,7 +9,7 @@
 // @downloadURL  https://github.com/DayvidKnows/Youtube-chapter-keyboard-navigation/raw/master/Youtube-chapter-keyboard-navigation.user.js
 // @updateURL    https://github.com/DayvidKnows/Youtube-chapter-keyboard-navigation/raw/master/Youtube-chapter-keyboard-navigation.user.js
 
-// @match        http*://www.youtube.com/watch?v=*
+// @match        http*://www.youtube.com/watch*
 // @require      https://code.jquery.com/jquery-3.4.1.min.js
 // @grant        none
 
