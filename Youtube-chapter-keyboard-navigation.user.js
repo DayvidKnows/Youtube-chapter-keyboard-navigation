@@ -88,7 +88,8 @@ async function getApp() {
 
             const segmentWidths = Array
                 .from(chapterContainer.querySelectorAll('.ytp-chapter-hover-container'))
-                .map(e => parseInt(e.style.width ?? 0, 10));
+                .map(e => parseInt(e.offsetWidth ?? 0, 10))
+                .filter(t => !isNaN(t) && t >= 0);
 
             const totalWidth = segmentWidths.reduce((total, current) => total + current);
 
@@ -134,12 +135,14 @@ async function getApp() {
 
                     if (event.key == 'n') {
                         const nextTime = nextChapterTime(times, video.currentTime);
+                        //console.debug(`[Youtube chapter keyboard navigation] Trying to skip to next chapter at ${nextTime}`);
                         if (nextTime > video.currentTime && nextTime < video.duration){
                             video.currentTime = nextTime;
                         }
                         blockDefaultAction = true;
                     } else if (event.key == 'p') {
                         const previousTime = previousChapterTime(times, video.currentTime);
+                        //console.debug(`[Youtube chapter keyboard navigation] Trying to skip to previous chapter at ${previousTime}`);
                         if(previousTime < video.currentTime && previousTime >= 0) {
                             video.currentTime = previousTime;
                         }
@@ -168,6 +171,9 @@ async function getApp() {
 
             const descriptionTimes = getDescriptionChapters(description);
             const containerTimes = getContainerChapters(chapterContainer, totalDuration);
+
+            //console.debug(`[Youtube chapter keyboard navigation] Found ${containerTimes.length} chapters in timeline: [${containerTimes}]`);
+            //console.debug(`[Youtube chapter keyboard navigation] Found ${descriptionTimes.length} chapters in description: [${descriptionTimes}]`);
 
             const times = containerTimes.length > descriptionTimes.length ? containerTimes : descriptionTimes;
 
