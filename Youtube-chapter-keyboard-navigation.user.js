@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Youtube chapter keyboard navigation
 // @description  Navigate youtube's video chapters by using the keys 'p' and 'n'
-// @version      2.0
+// @version      2.1
 // @author       dayvidKnows
 
 // @namespace    https://github.com/DayvidKnows/Youtube-chapter-keyboard-navigation/
