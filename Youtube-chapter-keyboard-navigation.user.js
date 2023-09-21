@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Youtube chapter keyboard navigation
 // @description  Navigate youtube's video chapters by using the keys 'p' and 'n'
-// @version      3.0
+// @version      3.1
 // @author       dayvidKnows
 
 // @namespace    https://github.com/DayvidKnows/Youtube-chapter-keyboard-navigation/
@@ -27,21 +27,6 @@ function logDebug(message) {
 
 function wait(t) {
   return new Promise(r => setTimeout(r, t));
-}
-
-function selectAllWithShadyFallback(container, selector) {
-
-  var element = container.querySelectorAll(selector);
-
-  if (element === null || element.length === 0) {
-    element = container.__shady_querySelectorAll(selector);
-  }
-
-  if (element === null || element.length === 0) {
-    element = container.__shady_native_querySelectorAll(selector);
-  }
-
-  return element;
 }
 
 async function getApp() {
@@ -107,24 +92,20 @@ function extractChaptersFromTimeline(timeline, totalDuration) {
   const totalDurationInSeconds = timeToSeconds(totalDuration.textContent);
 
   const segmentWidths = Array.from(timeline.querySelectorAll('.ytp-chapter-hover-container'))
-    .map(element => parseInt(element.offsetWidth, 10))
+    .map(element => element.offsetWidth)
     .filter(time => !isNaN(time) && time >= 0);
 
-  const totalWidth = segmentWidths.reduce((total, current) => total + current);
+  let totalWidth = segmentWidths.reduce((total, current) => total + current);
 
   return [0].concat(segmentWidths.map(segmentWidth => Math.round((segmentWidth / totalWidth) * totalDurationInSeconds))
     .map((sum = 0, current => sum += current)))
     .slice(0, -1);
 }
 
-
 (function () {
   getApp().then(app => {
 
-    let lock = false;
-    let times = [];
-
-    function changeChapterEventHandler(event, video) {
+    function changeChapterEventHandler(event, video, times) {
       if (document.activeElement.id != 'contenteditable-root' && document.activeElement.id != 'search') {
 
         var blockDefaultAction = false;
@@ -158,34 +139,6 @@ function extractChaptersFromTimeline(timeline, totalDuration) {
         if (blockDefaultAction) {
           event.preventDefault();
           event.stopPropagation();
-
-          if (!lock) {
-
-            lock = true;
-
-            logDebug('looking for times update');
-
-            wait(4000).then(() => {
-              const timelineLoader = searchInAppForParentWithChildren(app, '.ytp-chapters-container');
-              const totalDurationLoader = searchInAppForText(app, '.ytp-time-duration');
-
-              Promise.allSettled([timelineLoader, totalDurationLoader])
-                .then(([timeline, totalDuration]) => {
-                  const timelineTimes = extractChaptersFromTimeline(timeline.value, totalDuration.value);
-                  logDebug(`timeline found ${timelineTimes.length} times [${timelineTimes}]`);
-
-                  if (timelineTimes.length > times.length) {
-                    times = timelineTimes;
-                    logDebug('updating times from timeline');
-                  }
-
-                  logDebug('complete');
-
-                  lock = false;
-                });
-            });
-
-          }
         }
       }
     }
@@ -211,12 +164,13 @@ function extractChaptersFromTimeline(timeline, totalDuration) {
 
       const descriptionTimes = extractChapterFromLink(description.value, `.yt-core-attributed-string--link-inherit-color > a.yt-core-attributed-string__link--call-to-action-color[href^="/watch?v=${videoId}&t="]`);
       const structuredDescriptionTimes = extractChapterFromLink(structuredDescription.value, 'ytd-macro-markers-list-item-renderer > a#endpoint');
-      timelineTimes = extractChaptersFromTimeline(timeline.value, totalDuration.value);
+      const timelineTimes = extractChaptersFromTimeline(timeline.value, totalDuration.value);
 
       logDebug(`description found ${descriptionTimes.length} times [${descriptionTimes}]`);
       logDebug(`structured description found ${structuredDescriptionTimes.length} times [${structuredDescriptionTimes}]`);
       logDebug(`timeline found ${timelineTimes.length} times [${timelineTimes}]`);
 
+      let times = [];
 
       if (timelineTimes.length >= structuredDescriptionTimes.length) {
         times = timelineTimes;
@@ -238,7 +192,26 @@ function extractChaptersFromTimeline(timeline, totalDuration) {
 
       const video = app.querySelector('#ytd-player video');
 
-      window.onkeyup = (event) => { changeChapterEventHandler(event, video) };
+      window.onkeyup = (event) => { changeChapterEventHandler(event, video, times) };
+
+      for (var i = 0; i < 3; i++) {
+        let seconds = 2 ** i;
+        wait(seconds * 1000).then(() => {
+          logDebug(`update after ${seconds} seconds`)
+
+          Promise.resolve(searchInAppForParentWithChildren(app, '.ytp-chapters-container'))
+            .then((timeline) => {
+
+              const timelineTimes = extractChaptersFromTimeline(timeline, totalDuration.value);
+              logDebug(`timeline found ${timelineTimes.length} times [${timelineTimes}]`);
+
+              if (timelineTimes.length > times.length) {
+                times = timelineTimes;
+                logDebug('updating times from timeline');
+              }
+            });
+        });
+      }
 
       logDebug('complete');
 
