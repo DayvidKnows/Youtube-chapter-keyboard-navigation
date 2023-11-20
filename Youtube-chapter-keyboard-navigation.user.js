@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Youtube chapter keyboard navigation
 // @description  Navigate youtube's video chapters by using the keys 'p' and 'n'
-// @version      3.2.0
+// @version      3.3.0
 // @author       dayvidKnows
 
 // @namespace    https://github.com/DayvidKnows/Youtube-chapter-keyboard-navigation/
@@ -9,11 +9,9 @@
 // @downloadURL  https://github.com/DayvidKnows/Youtube-chapter-keyboard-navigation/raw/master/Youtube-chapter-keyboard-navigation.user.js
 // @updateURL    https://github.com/DayvidKnows/Youtube-chapter-keyboard-navigation/raw/master/Youtube-chapter-keyboard-navigation.user.js
 
-// @match        http*://www.youtube.com/watch*
-// @require      https://code.jquery.com/jquery-3.4.1.min.js
-// @grant        none
+// @match        *://www.youtube.com/*
 
-// @run-at       document-body
+// @grant        none
 
 // ==/UserScript==
 
@@ -115,7 +113,7 @@ function changeChapterEventHandler(event, video, times) {
         else {
           const nextTime = Math.min(...times.filter(t => t > video.currentTime));
 
-          logDebug(`trying to skip to next chapter at ${nextTime}`);
+          logDebug(`skiping to next chapter at ${nextTime}`);
 
           if (nextTime > video.currentTime && nextTime < video.duration) {
             video.currentTime = nextTime;
@@ -130,7 +128,7 @@ function changeChapterEventHandler(event, video, times) {
         else {
           const previousTime = Math.max(...times.filter(t => t < video.currentTime - 1));
 
-          logDebug(`trying to skip to previous chapter at ${previousTime}`);
+          logDebug(`skiping to previous chapter at ${previousTime}`);
 
           if (previousTime < video.currentTime && previousTime >= 0) {
             video.currentTime = previousTime;
@@ -176,7 +174,7 @@ function changeChapterEventHandler(event, video, times) {
 
       let times = [];
 
-      if (timelineTimes.length >= structuredDescriptionTimes.length) {
+      if (timelineTimes.length >= structuredDescriptionTimes.length && timelineTimes.length >= descriptionTimes.length) {
         times = timelineTimes;
         logDebug('using timeline');
       }
