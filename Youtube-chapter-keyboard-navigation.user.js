@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Youtube chapter keyboard navigation
 // @description  Navigate youtube's video chapters by using the keys 'p' and 'n'
-// @version      3.3.0
+// @version      3.3.1
 // @author       dayvidKnows
 
 // @namespace    https://github.com/DayvidKnows/Youtube-chapter-keyboard-navigation/
@@ -88,12 +88,15 @@ function timeToSeconds(timeString) {
 
 function extractChaptersFromTimeline(timeline, totalDuration) {
   const totalDurationInSeconds = timeToSeconds(totalDuration.textContent);
+  logDebug(`totalDurationInSeconds: ${totalDurationInSeconds}`);
 
   const segmentWidths = Array.from(timeline.querySelectorAll('.ytp-chapter-hover-container'))
     .map(element => element.offsetWidth)
-    .filter(time => !isNaN(time) && time >= 0);
+    .filter(width => !isNaN(width) && width > 0);
+  logDebug(`segmentWidths: [${segmentWidths}]`);
 
-  let totalWidth = segmentWidths.reduce((total, current) => total + current);
+  const totalWidth = Math.max(segmentWidths.reduce((total, current) => total + current, 0), 1);
+  logDebug(`totalWidth: ${totalWidth}`);
 
   return [0].concat(segmentWidths.map(segmentWidth => Math.round((segmentWidth / totalWidth) * totalDurationInSeconds))
     .map((sum = 0, current => sum += current)))
@@ -168,23 +171,23 @@ function changeChapterEventHandler(event, video, times) {
       const structuredDescriptionTimes = structuredDescription.value ? extractChapterFromLink(structuredDescription.value, 'ytd-macro-markers-list-item-renderer > a#endpoint') : [];
       const timelineTimes = timeline.value.childElementCount > 1 ? extractChaptersFromTimeline(timeline.value, totalDuration.value) : [];
 
-      logDebug(`description found ${descriptionTimes.length} times [${descriptionTimes}]`);
-      logDebug(`structured description found ${structuredDescriptionTimes.length} times [${structuredDescriptionTimes}]`);
-      logDebug(`timeline found ${timelineTimes.length} times [${timelineTimes}]`);
+      logDebug(`description found ${descriptionTimes.length} times: [${descriptionTimes}]`);
+      logDebug(`structured description found ${structuredDescriptionTimes.length} times: [${structuredDescriptionTimes}]`);
+      logDebug(`timeline found ${timelineTimes.length} times: [${timelineTimes}]`);
 
       let times = [];
 
-      if (timelineTimes.length >= structuredDescriptionTimes.length && timelineTimes.length >= descriptionTimes.length) {
-        times = timelineTimes;
-        logDebug('using timeline');
-      }
-      else if (structuredDescriptionTimes.length >= descriptionTimes.length) {
+      if (structuredDescriptionTimes.length >= timelineTimes.length && structuredDescriptionTimes.length >= descriptionTimes.length) {
         times = structuredDescriptionTimes;
-        logDebug('using structured description');
+        logDebug(`using structured description: [${structuredDescriptionTimes}]`);
+      }
+      else if (timelineTimes.length >= descriptionTimes.length) {
+        times = timelineTimes;
+        logDebug(`using timeline: [${timelineTimes}]`);
       }
       else if (descriptionTimes.length > 0) {
         times = descriptionTimes;
-        logDebug('using description');
+        logDebug(`using description: [${descriptionTimes}]`);
       }
 
       for (var i = 0; i < 3; i++) {
